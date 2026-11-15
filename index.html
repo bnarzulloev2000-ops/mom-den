@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Мой день">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Мой день</title>
+<style>
+:root{color-scheme:dark;--bg:#080808;--panel:#151515;--panel2:#1d1d1d;--line:#2c2c2c;--muted:#999;--green:#36d17c;--red:#ff6262;--white:#f5f5f5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));}
+main{max-width:560px;margin:0 auto}.top{display:flex;justify-content:space-between;align-items:center;padding:20px 2px 16px}.brand{font-weight:800;letter-spacing:.12em;font-size:13px;color:#fff}.tag{font-size:11px;color:var(--muted);letter-spacing:.08em;margin-top:5px}.date{font-size:13px;color:var(--muted);text-align:right}
+h1{font-size:34px;letter-spacing:-.04em;margin:18px 0 4px}.sub{color:var(--muted);font-size:14px}.progress-card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:18px}.progress-head{display:flex;justify-content:space-between;font-size:14px;margin-bottom:12px}.track{height:8px;background:#303030;border-radius:20px;overflow:hidden}.fill{height:100%;width:0;background:var(--green);border-radius:20px;transition:width .2s}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 10px}.section-head h2{font-size:17px;margin:0}.muted{color:var(--muted);font-size:12px}
+.task{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:14px;border-radius:16px;margin:9px 0}.check{width:25px;height:25px;border:1.5px solid #777;border-radius:50%;flex:none;background:transparent;color:#06140c;font-weight:900;font-size:16px}.check.done{background:var(--green);border-color:var(--green)}.task-main{min-width:0;flex:1}.task-title{font-size:15px;overflow-wrap:anywhere}.task.done .task-title{text-decoration:line-through;color:#858585}.meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px;margin-top:5px}.priority{width:7px;height:7px;border-radius:50%;display:inline-block}.high{background:var(--red)}.medium{background:#f0b84b}.low{background:#7b9cff}.actions{display:flex;gap:6px}.icon-btn{border:0;background:transparent;color:#aaa;font-size:18px;padding:5px}
+.primary{width:100%;border:0;border-radius:15px;background:var(--green);color:#07120b;font-weight:750;padding:15px;font-size:15px;margin-top:16px}.secondary{background:#242424;color:#eee;border:1px solid var(--line)}
+.empty{text-align:center;padding:28px 10px;color:var(--muted);font-size:14px}
+nav{position:sticky;bottom:0;background:rgba(8,8,8,.94);backdrop-filter:blur(12px);display:flex;gap:8px;padding:12px 0 calc(8px + env(safe-area-inset-bottom));margin-top:22px}
+nav button{flex:1;border:1px solid var(--line);background:#141414;color:#aaa;border-radius:13px;padding:11px 5px;font-size:12px}nav button.active{color:var(--green);border-color:#286b47}
+dialog{width:min(100%,520px);border:1px solid #393939;border-radius:22px;background:#151515;color:#fff;padding:20px;max-height:90vh}dialog::backdrop{background:#000b}dialog h2{margin:0 0 16px;font-size:20px}label{display:block;color:#aaa;font-size:12px;margin:12px 0 6px}input,select,textarea{width:100%;border:1px solid #383838;border-radius:12px;background:#090909;color:#fff;padding:13px;font:inherit;min-height:46px}input[type=checkbox]{width:auto;min-height:0}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dialog-actions{display:flex;gap:8px;margin-top:18px}.dialog-actions button{flex:1}.stat{background:#1d1d1d;border-radius:14px;padding:14px}.stat strong{display:block;font-size:25px;margin-top:4px}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div><div class="brand">МОЙ ДЕНЬ</div><div class="tag">ТВОЙ ДЕНЬ. ТВОИ ПРАВИЛА.</div></div><div class="date" id="todayDate"></div></header>
+<section id="home">
+<h1>Сегодня</h1><div class="sub">Собери день по шагам.</div>
+<div class="progress-card"><div class="progress-head"><span>Прогресс дня</span><strong id="progressText">0%</strong></div><div class="track"><div class="fill" id="progressFill"></div></div><div class="muted" id="progressCount" style="margin-top:9px">0 из 0 выполнено</div></div>
+<div class="section-head"><h2>Мои задачи</h2><span class="muted" id="taskCount"></span></div>
+<div id="taskList"></div>
+<button class="primary" id="addBtn">＋ Добавить задачу</button>
+<div class="section-head"><h2>Вечерний обзор</h2><span class="muted">21:00</span></div>
+<div class="panel"><div class="muted">Подведи итоги дня и подготовь завтра.</div><button class="primary secondary" id="reviewBtn">Открыть обзор дня</button></div>
+</section>
+<section id="history" class="hidden"><h1>История</h1><div class="sub">Выполненные и перенесённые задачи.</div><div id="historyList"></div></section>
+<section id="stats" class="hidden"><h1>Статистика</h1><div class="sub">Твой прогресс.</div><div class="form-row" style="margin-top:18px"><div class="stat"><span class="muted">Выполнено</span><strong id="statDone">0</strong></div><div class="stat"><span class="muted">Всего задач</span><strong id="statTotal">0</strong></div></div><div class="panel"><div class="muted">Процент выполнения за всё время</div><h2 id="statRate">0%</h2></div></section>
+<nav><button class="active" data-tab="home">Сегодня</button><button data-tab="history">История</button><button data-tab="stats">Статистика</button></nav>
+</main>
+<dialog id="taskDialog"><form method="dialog" id="taskForm"><h2 id="dialogTitle">Новая задача</h2><label for="taskName">Название</label><input id="taskName" maxlength="120" placeholder="Например, позвонить клиенту" required><div class="form-row"><div><label for="taskDate">Дата</label><input id="taskDate" type="date" required></div><div><label for="taskTime">Время</label><input id="taskTime" type="time" required></div></div><label for="taskPriority">Приоритет</label><select id="taskPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option></select><div class="dialog-actions"><button class="primary secondary" value="cancel">Отмена</button><button class="primary" id="saveTask" value="default">Сохранить</button></div></form></dialog>
+<dialog id="reviewDialog"><h2>Вечерний обзор</h2><div id="reviewContent"></div><div class="dialog-actions"><button class="primary secondary" id="closeReview">Закрыть</button><button class="primary" id="tomorrowBtn">Подготовить завтра</button></div></dialog>
+<script>
+const $=id=>document.getElementById(id);
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const shiftDate=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+let tasks=JSON.parse(localStorage.getItem('mojden_tasks')||'[]'), history=JSON.parse(localStorage.getItem('mojden_history')||'[]'), editing=null;
+function save(){localStorage.setItem('mojden_tasks',JSON.stringify(tasks));localStorage.setItem('mojden_history',JSON.stringify(history))}
+function rollover(){const t=today();tasks.forEach(x=>{if(!x.done&&x.date<t){history.push({...x,status:'Перенесена',movedTo:t,archivedAt:new Date().toISOString()});x.date=t;x.moved=true}});save()}
+function render(){
+ rollover(); const t=today(), todays=tasks.filter(x=>x.date===t).sort((a,b)=>a.time.localeCompare(b.time));
+ const done=todays.filter(x=>x.done).length, pct=todays.length?Math.round(done/todays.length*100):0;
+ $('todayDate').textContent=new Date().toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'long'});
+ $('progressText').textContent=pct+'%';$('progressFill').style.width=pct+'%';$('progressCount').textContent=`${done} из ${todays.length} выполнено`;$('taskCount').textContent=todays.length+' шт.';
+ $('taskList').innerHTML=todays.length?'':'<div class="empty">Пока задач нет.<br>Добавь первое дело — начнём!</div>';
+ todays.forEach(x=>{const el=document.createElement('div');el.className='task'+(x.done?' done':'');el.innerHTML=`<button class="check ${x.done?'done':''}" aria-label="Отметить выполнение">${x.done?'✓':''}</button><div class="task-main"><div class="task-title"></div><div class="meta"><span>${x.time}</span><span>·</span><span class="priority ${x.priority}"></span><span>${x.priority==='high'?'Высокий':x.priority==='medium'?'Средний':'Низкий'}</span>${x.moved?'<span>· перенесена</span>':''}</div></div><div class="actions"><button class="icon-btn edit" aria-label="Изменить">✎</button><button class="icon-btn delete" aria-label="Удалить">×</button></div>`;el.querySelector('.task-title').textContent=x.name;el.querySelector('.check').onclick=()=>{x.done=!x.done;if(x.done)history.push({...x,status:'Выполнена',archivedAt:new Date().toISOString()});save();render()};el.querySelector('.edit').onclick=()=>openTask(x.id);el.querySelector('.delete').onclick=()=>{tasks=tasks.filter(y=>y.id!==x.id);save();render()};$('taskList').append(el)});
+ $('historyList').innerHTML=history.slice().reverse().map(x=>`<div class="task"><div class="task-main"><div class="task-title">${escapeHtml(x.name)}</div><div class="meta">${x.date} · ${x.time} · ${x.status}</div></div></div>`).join('')||'<div class="empty">История пока пуста.</div>';
+ const total=history.filter(x=>x.status==='Выполнена').length; $('statDone').textContent=total;$('statTotal').textContent=history.length;$('statRate').textContent=(history.length?Math.round(total/history.length*100):0)+'%';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function openTask(id){editing=id||null;const x=tasks.find(y=>y.id===id);$('dialogTitle').textContent=x?'Изменить задачу':'Новая задача';$('taskName').value=x?.name||'';$('taskDate').value=x?.date||today();$('taskTime').value=x?.time||'09:00';$('taskPriority').value=x?.priority||'medium';$('taskDialog').showModal()}
+$('addBtn').onclick=()=>openTask();$('taskForm').onsubmit=e=>{if(e.submitter?.value==='cancel')return;e.preventDefault();const data={id:editing||crypto.randomUUID(),name:$('taskName').value.trim(),date:$('taskDate').value,time:$('taskTime').value,priority:$('taskPriority').value,done:false};if(!data.name)return;if(editing){const old=tasks.find(x=>x.id===editing);Object.assign(old,data,{done:old.done})}else tasks.push(data);save();$('taskDialog').close();render()};
+function review(){const t=today(),list=tasks.filter(x=>x.date===t),done=list.filter(x=>x.done),pending=list.filter(x=>!x.done);$('reviewContent').innerHTML=`<div class="form-row"><div class="stat"><span class="muted">Выполнено</span><strong>${done.length}</strong></div><div class="stat"><span class="muted">Осталось</span><strong>${pending.length}</strong></div></div><div class="panel"><b>Невыполненные задачи</b><div class="muted" style="margin-top:8px">${pending.map(x=>escapeHtml(x.name)+' · '+x.time).join('<br>')||'Всё выполнено — отлично!'}</div></div>`;$('reviewDialog').showModal()}
+$('reviewBtn').onclick=review;$('closeReview').onclick=()=>$('reviewDialog').close();$('tomorrowBtn').onclick=()=>{tasks.filter(x=>x.date===today()&&!x.done).forEach(x=>{x.date=shiftDate(today(),1);x.moved=true});save();$('reviewDialog').close();render()};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));['home','history','stats'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab))});
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>
